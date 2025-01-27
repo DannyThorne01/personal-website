@@ -48,3 +48,5 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+  env:
+    GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOW_TOKEN }}
