@@ -1,6 +1,6 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-const BASE_PATH = "/svelte-github-template";
+const BASE_PATH = "/personal-website";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
