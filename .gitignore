@@ -1,0 +1,7 @@
+.yarn
+myvenv
+node_modules
+.svelte-kit
+build
+.yarn
+.DS_Store
