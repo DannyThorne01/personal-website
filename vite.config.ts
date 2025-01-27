@@ -2,9 +2,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	base :"/personal-website/",
+	plugins: [sveltekit()],
+	base: '/personal-website/', // Matches GitHub Pages base path
 	build: {
-    outDir: 'dist', // Output folder for build files
-  },
-	plugins: [sveltekit()]
+		outDir: 'build', // Matches the workflow "path" for artifacts
+	},
 });
