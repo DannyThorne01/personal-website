@@ -39,6 +39,8 @@
 	},
 	"packageManager": "yarn@4.6.0",
 	"dependencies": {
+		"@deck.gl/core": "^9.1.0",
+		"@deck.gl/layers": "^9.1.0",
 		"@sveltejs/adapter-static": "^3.0.8"
 	}
 }
