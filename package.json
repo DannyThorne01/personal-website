@@ -46,7 +46,7 @@
 		"@sveltejs/adapter-static": "^3.0.8",
 		"d3": "^7.9.0",
 		"d3-scale": "^4.0.2",
-		"maplibre-gl": "^5.1.0",
+		"maplibre-gl": "^4.1.0",
 		"react-map-gl": "^7.1.9",
 		"svelte-maplibre-gl": "^0.1.3"
 	}
