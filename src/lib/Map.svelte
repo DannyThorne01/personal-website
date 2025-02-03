@@ -2,9 +2,10 @@
   import { onMount ,createEventDispatcher} from 'svelte';
   import { scaleQuantile } from 'd3-scale';
   import { Deck } from '@deck.gl/core';
-  import { ArcLayer, ScatterplotLayer,IconLayer } from '@deck.gl/layers';
+  import { ArcLayer, GeoJsonLayer, ScatterplotLayer,IconLayer } from '@deck.gl/layers';
   import maplibregl from 'maplibre-gl';
   import { destinationStore } from '$lib/variablestore';
+  import data from '$lib/geometries.json';
   
   export const inFlowColors = [
     [255, 255, 204], [199, 233, 180], [127, 205, 187],
@@ -37,9 +38,9 @@
 
   const arcs = [
       { source: { latitude: 6.8013, longitude: -58.1551 }, target:{ latitude: 42.443, longitude: -76.5019 }, value: 300, quantile: 0, sourceName: "Georgetown, Guyana", targetName: "Ithaca, New York" },
-      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 32.7767, longitude: -96.797 }, value: 150, quantile: 0, sourceName: "Ithaca, New York", targetName:  "Dallas, Texas" },
-      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 42.3601, longitude: -71.0589 }, value: 200, quantile: 0,sourceName: "Ithaca, New York", targetName:  "Boston, MA"},
-      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 37.7749, longitude: -122.4194 }, value: 200, quantile: 0, sourceName: "Ithaca, New York", targetName:  "San Francisco, CA" },
+      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 32.7767, longitude: -96.797 }, value: 300, quantile: 0, sourceName: "Ithaca, New York", targetName:  "Dallas, Texas" },
+      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 42.3601, longitude: -71.0589 }, value: 300, quantile: 0,sourceName: "Ithaca, New York", targetName:  "Boston, MA"},
+      { source: { latitude: 42.443, longitude: -76.5019 }, target: { latitude: 37.7749, longitude: -122.4194 }, value: 500, quantile: 0, sourceName: "Ithaca, New York", targetName:  "San Francisco, CA" },
       { source: { latitude: 37.7749, longitude: -122.4194 }, target: { latitude: 37.8651, longitude: -119.5383 }, value: 200, quantile: 0, sourceName: "San Francisco, CA", targetName:  "Yosemite" }
     ];
   const quantileScale = scaleQuantile()
@@ -49,14 +50,13 @@
     a.quantile = quantileScale(Math.abs(a.value));
   });
   const INITIAL_VIEW_STATE = {
-    latitude: 37.7749,
-    longitude: -98,
-    zoom: 2.5,
+    latitude: 28,
+    longitude: -88,
+    zoom: 3.3,
     bearing: 0,
     pitch: 30
   };
 
-  
 
   onMount(() => {
     let chosenArc: Arc = null;
@@ -65,13 +65,40 @@
 
     // Initialize MapLibre
     map = new maplibregl.Map({
-      container: mapContainer,
-      style: 'https://demotiles.maplibre.org/style.json',
-      center: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude],
-      interactive: true,
-     
-    });
+  container: mapContainer,
+  style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+  center: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude],
+  zoom: INITIAL_VIEW_STATE.zoom,
+  interactive: true, // Keep interactions on but manually control zoom
+  scrollZoom: true // Disable default scroll zoom
+});
 
+// // Re-enable zoom only when Ctrl is pressed
+// map.scrollZoom.disable();
+// window.addEventListener('wheel', (event) => {
+//   if (event.ctrlKey) {
+//     map.scrollZoom.enable(); // Enable zooming when Ctrl is held
+//   } else {
+//     map.scrollZoom.disable(); // Disable zooming if Ctrl is not held
+//   }
+// });
+    
+    const highlightLayer = new GeoJsonLayer({
+            id: 'airports',
+            data: data,
+            // Styles
+            filled: true,
+            pointRadiusMinPixels: 2,
+            pointRadiusScale: 2000,
+            getPointRadius: f => 11 - f.properties.scalerank,
+            getFillColor: [200, 0, 80, 180],
+            // Interactive props
+            pickable: true,
+            autoHighlight: true,
+            onClick: info =>
+              // eslint-disable-next-line
+              info.object && alert(`${info.object.properties.name} (${info.object.properties.abbrev})`)
+          })
     const arcLayer = new ArcLayer({
       id: 'arc-layer',
       data: arcs,
@@ -107,22 +134,45 @@
       pickable: true
     });
     deck = new Deck({
-      canvas: deckCanvas,
-      width: '100%',
-      height: '100%',
-      initialViewState: INITIAL_VIEW_STATE,
-      controller: true,
-      layers: [arcLayer],
-      getTooltip: ({ object }) => object && object.name,
-      onViewStateChange: ({ viewState }) => {
-        map.jumpTo({
-          center: [viewState.longitude, viewState.latitude],
-          zoom: viewState.zoom,
-          bearing: viewState.bearing,
-          pitch: viewState.pitch
-        });
-      }
+  canvas: deckCanvas,
+  width: '100%',
+  height: '100%',
+  initialViewState: INITIAL_VIEW_STATE,
+  controller: {
+    scrollZoom: false, // Disable default scroll zoom
+    dragPan: true,
+    dragRotate: true,
+    doubleClickZoom: true
+  },
+  layers: [arcLayer, iconLayer],
+  onViewStateChange: ({ viewState, interactionState }) => {
+    // Prevent zooming out too much
+    if (viewState.zoom < INITIAL_VIEW_STATE.zoom) {
+      viewState.zoom = INITIAL_VIEW_STATE.zoom;
+    }
+
+    // Sync with MapLibre
+    map.jumpTo({
+      center: [viewState.longitude, viewState.latitude],
+      zoom: viewState.zoom,
+      bearing: viewState.bearing,
+      pitch: viewState.pitch
     });
+  }
+});
+
+// Add event listener to enable zoom only when Ctrl is held
+// window.addEventListener('wheel', (event) => {
+//   if (event.ctrlKey) {
+//     deck.setProps({
+//       controller: { scrollZoom: true } // Enable zoom when Ctrl is pressed
+//     });
+//   } else {
+//     deck.setProps({
+//       controller: { scrollZoom: false } // Disable zoom otherwise
+//     });
+//   }
+// });
 
   
   function animate() {
@@ -145,12 +195,12 @@
           getFillColor: [255, 0, 0]
         });
         deck.setProps({
-          layers: [arcLayer, movingDotLayer, iconLayer]
+          layers: [arcLayer, movingDotLayer, iconLayer, highlightLayer]
         });
       }
     } else {
       deck.setProps({
-        layers: [arcLayer, iconLayer]
+        layers: [arcLayer, iconLayer, highlightLayer]
       });
     }
     requestAnimationFrame(animate);
@@ -174,7 +224,7 @@
 <style>
   .deck-container {
     width: 85%;
-    height: 600px;
+    height: 800px;
     border-radius: 20px;
     overflow: hidden;
     position: relative;
