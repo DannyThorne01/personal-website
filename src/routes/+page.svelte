@@ -1,11 +1,12 @@
 <script lang="ts">
   import Map from '$lib/Map.svelte';
   import LifeSection from '$lib/LifeSection.svelte';
+  import LifeSummary from '$lib/LifeSummary.svelte';
+  import NavBar from '$lib/NavBar.svelte';
 </script>
-
-<h1>Welcome to My Website, Currently under construction but feel free to look around</h1>
-
+ <NavBar/>
 <div>
   <Map/>
+  <LifeSummary/>
 </div>
 <LifeSection/>

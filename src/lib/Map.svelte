@@ -52,7 +52,7 @@
   const INITIAL_VIEW_STATE = {
     latitude: 28,
     longitude: -88,
-    zoom: 3.3,
+    zoom:3,
     bearing: 0,
     pitch: 30
   };
@@ -139,7 +139,7 @@
   height: '100%',
   initialViewState: INITIAL_VIEW_STATE,
   controller: {
-    scrollZoom: false, // Disable default scroll zoom
+    scrollZoom: false,
     dragPan: true,
     dragRotate: true,
     doubleClickZoom: true
@@ -223,12 +223,13 @@
 
 <style>
   .deck-container {
-    width: 85%;
-    height: 800px;
+    width: 60%;  /* Smaller width */
+    height: 600px; /* Smaller height */
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    margin: auto;
+    margin-left: 5%; 
+    margin-top: 0px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
     display: flex;
@@ -244,9 +245,11 @@
     width: 100%;
     height: 100%;
   }
+
   .deck-canvas {
     pointer-events: auto; 
   }
+
   .tooltip {
     position: absolute;
     pointer-events: none;
@@ -261,3 +264,4 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 </style>
+

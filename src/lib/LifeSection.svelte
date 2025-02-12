@@ -32,7 +32,7 @@
   .gallery__item--1 {
     grid-column: 1 / span 2;
     grid-row: 1 / span 2;
-    border-radius: 16px;
+    border-radius: 50px;
   }
 
   .gallery__item--2 {
