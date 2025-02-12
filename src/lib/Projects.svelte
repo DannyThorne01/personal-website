@@ -9,14 +9,20 @@
   let scroller;
 
   onMount(() => {
-    const main = d3.select("main");
+
     const layer = d3.select("#graph").append("g");
-    const width = d3.select("#graph").attr("width");
-    const height = d3.select("#graph").attr("height");
-    const scrolly = main.select("#scrolly");
+    const scrolly = d3.select("#scrolly");
     const figure = scrolly.select("figure");
     const article = scrolly.select("article");
     const step = article.selectAll(".step");
+    function getGraphSize() {
+    const graph = d3.select("#graph").node();
+    return {
+        width: graph.getBoundingClientRect().width,
+        height: graph.getBoundingClientRect().height
+      };
+    }
+    let { width, height } = getGraphSize();
 
     let nodes = data.project_list;
     let accumulator = 0;
@@ -33,12 +39,11 @@
             let links = []; 
             active_nodes.forEach(node => { 
                 let node_index = nodes.indexOf(node)
-                console.log("Node Index:", node_index, "Node Value:", node);
+                // console.log("Node Index:", node_index, "Node Value:", node);
                 // @ts-ignore
                 let node_conns = data.projects[node].related
                 // make sure the link is created as a map like {source: <> , target: <>}
                 Object.keys(node_conns).forEach(node_conn => {
-    
                     if (active_nodes.includes(node_conn)) {
                         let link = { 'source': nodes.indexOf(node), 'target': nodes.indexOf(node_conn), 'src_name': node, 'tgt_name': node_conn};
                         links.push(link);
@@ -51,26 +56,24 @@
             // Neeed to do this for the simulator
             let active_nodes_num = active_nodes.map(node => ({ id: nodes.indexOf(node), name: node }));
             d3.forceSimulation()
-                // @ts-ignore
-                .nodes(active_nodes_num)
-                .force("links", d3.forceLink()
-                    .links(links)
-                    .id(node => node['id']))
-                .force("repulse", d3.forceManyBody().strength(-2000)) 
-                .force("center", d3.forceCenter(width / 2.0, height / 2.0))
-                .on("tick", render);
+            .nodes(active_nodes_num)
+            .force("links", d3.forceLink().links(links).id(node => node['id']).distance(100)) // Ensures spacing
+            .force("repulse", d3.forceManyBody().strength(-200)) // Reduce repulsion
+            .force("center", d3.forceCenter(width / 2.0, height / 2.0))
+            .alphaDecay(0.1) // Slows down stabilization
+            .velocityDecay(0.8) // Smooths node movement
+            .on("tick", render);
 
             function render() { // START OF RENDER FUNCTION
-
                 // triangle arrowhead markers
                 // docs : https://observablehq.com/@xianwu/force-directed-graph-network-graph-with-arrowheads-and-lab
                 layer.append("defs").append("marker")
                     .attr("id", "arrowhead")
                     .attr("viewBox", "0 -5 10 10")
-                    .attr("refX", 15) // Adjust position of the arrow relative to the end of the line
+                    .attr("refX", 16) // Adjust position of the arrow relative to the end of the line
                     .attr("refY", 0)
-                    .attr("markerWidth", 6)
-                    .attr("markerHeight", 6)
+                    .attr("markerWidth", 5)
+                    .attr("markerHeight", 5)
                     .attr("orient", "auto") // Ensures the arrowhead rotates with the line
                     .append("path")
                     .attr("d", "M0,-5L10,0L0,5") // Arrowhead shape
@@ -85,6 +88,7 @@
                             .attr("stroke-width", 3)
                             .attr("marker-end", "url(#arrowhead)")
                     )
+                   
                     .attr("x1", d => d.source.x).attr("x2", d => d.target.x)
                     .attr("y1", d => d.source.y).attr("y2", d => d.target.y);
 
@@ -121,6 +125,7 @@
                         },
                     ) // END OF DATA JOIN
                     .attr("transform", d => `translate(${d.x},${d.y})`);
+                    
             } //END OF RENDER FUNCTION
             render();
         } // END OF POPULATE NETWORK
@@ -128,7 +133,7 @@
     function handleResize() {
       var stepH = Math.floor(window.innerHeight * 0.75);
       step.style("height", stepH + "px");
-
+      
       var figureHeight = window.innerHeight / 2;
       var figureMarginTop = (window.innerHeight - figureHeight) / 2;
 
@@ -137,21 +142,21 @@
         .style("top", figureMarginTop + "px");
 
       scroller.resize();
+      let newSize = getGraphSize();
+      width = newSize.width;
+      height = newSize.height;
     }
 
     /**
        * @param {{ index: number; }} response
        */
     function handleStepEnter(response) {
-      step.classed("is-active", (d, i) => i === response.index);
-      
-
+      // step.classed("is-active", (d, i) => i === response.index);
       if (response.index > lastIndex) {
         // Scrolling down → Increase accumulator
         start = false
         accumulator++;
         active_nodes.push(nodes[response.index]); // Add node
-        populateNetwork();
       } else if (response.index < lastIndex) {
         start = false
         // Scrolling up → Decrease accumulator
@@ -159,12 +164,10 @@
 
         // Find and remove the last active node
         let d_node = nodes[lastIndex]; 
-        active_nodes = active_nodes.filter(node => node !== d_node); // Correct filtering
-
-        populateNetwork();
-  }
-  
-  lastIndex = response.index; // Update last step index
+        active_nodes = active_nodes.filter(node => node !== d_node); // Correct filtering 
+      }
+      populateNetwork();
+      lastIndex = response.index; // Update last step index
 }
 
 populateNetwork()
@@ -190,11 +193,11 @@ populateNetwork()
   });
 </script>
 
-<main>
+
   <section id="scrolly">
     <figure>
   
-        <svg id="graph" height="500" width="600" style="background: #1a1a2e; 
+        <svg id="graph" style="background: #1a1a2e; 
            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
            border-radius: 8px;">
         </svg>
@@ -215,7 +218,7 @@ populateNetwork()
       </div>
     </article>
   </section>
-</main>
+
 <style>
   #scrolly {
     width:100%;

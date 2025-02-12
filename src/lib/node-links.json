@@ -4,7 +4,8 @@
         "type":"internship",
         "related":{
             "MITLL":5,
-            "Greenzone":4
+            "Greenzone":4,
+            "CAIR_Research":2
         },
         "skills":["Deployment", "Machine Learning"],
         "languages":["Python", "Terraform"]
