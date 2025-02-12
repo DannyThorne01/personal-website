@@ -1,23 +1,22 @@
 <script>
-// @ts-nocheck
-
+  // @ts-nocheck
   import { destinationStore } from '$lib/variablestore';
-  import data from '$lib/desc.json'
+  import data from '$lib/desc.json';
 </script>
 
 <style>
   /* Container for the entire gallery */
   .container {
-    width: 80%;
-    margin: 1rem auto; 
+    width: 100%;
+    margin: 1rem auto;
   }
 
-  /* Use CSS grid to create a masonry layout */
+
   .gallery {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 5vw);
-    grid-gap: 1.5rem; 
+    grid-auto-flow: dense; 
+    grid-gap: 1.5rem;
   }
 
   /* Ensure images cover their block fully */
@@ -25,10 +24,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block; 
+    display: block;
+    border-radius: 16px;
   }
 
-  /* Positioning for each gallery item */
+  /* Base styles for gallery items */
   .gallery__item--1 {
     grid-column: 1 / span 2;
     grid-row: 1 / span 2;
@@ -71,21 +71,42 @@
     grid-row: 6 / span 3;
     border-radius: 16px;
   }
+
+  /* Responsive Layout */
+  @media (max-width: 768px) {
+    .gallery {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Smaller column sizes */
+    }
+    .gallery__item--3 {
+      grid-column: 1 / -1; /* Takes full width */
+      grid-row: auto;
+      order: -1;
+    }
+    /* Keep all other gallery items flexible */
+    .gallery__item {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    /* Ensure images are not oversized */
+    .gallery__img {
+      border-radius: 12px;
+    }
+  }
 </style>
 
 <div class="container">
   <div class="gallery">
-    <figure class="gallery__item gallery__item--1">
-      <img src="https://i.pinimg.com/736x/73/2b/db/732bdbf7098a62691f3c28abc895b8fd.jpg" alt="Gallery image 1" class="gallery__img">
-    </figure>
-    <figure class="gallery__item gallery__item--2">
-      <img src="https://i.pinimg.com/736x/8c/df/18/8cdf186422551f88c0f17b14fe46fef0.jpg" alt="Gallery image 2" class="gallery__img">
-    </figure>
     <figure class="gallery__item gallery__item--3">
       <div class="life-section">
         <p>{$destinationStore}</p>
         <p>{data[$destinationStore] || "No description available"}</p>
       </div>
+    </figure>
+    <figure class="gallery__item gallery__item--1">
+      <img src="https://i.pinimg.com/736x/73/2b/db/732bdbf7098a62691f3c28abc895b8fd.jpg" alt="Gallery image 1" class="gallery__img">
+    </figure>
+    <figure class="gallery__item gallery__item--2">
+      <img src="https://i.pinimg.com/736x/8c/df/18/8cdf186422551f88c0f17b14fe46fef0.jpg" alt="Gallery image 2" class="gallery__img">
     </figure>
     <figure class="gallery__item gallery__item--4">
       <img src="https://i.pinimg.com/736x/02/02/cc/0202cc0103d45b9855580efb25ae8e1f.jpg" alt="Gallery image 4" class="gallery__img">

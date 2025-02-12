@@ -1,0 +1,42 @@
+{
+    "projects":{
+        "Google_STEP":{
+        "type":"internship",
+        "related":{
+            "MITLL":5,
+            "Greenzone":4
+        },
+        "skills":["Deployment", "Machine Learning"],
+        "languages":["Python", "Terraform"]
+        },
+        "MITLL":{
+            "type":"internship",
+            "related":{
+                "Greenzone":4
+            },
+            "skills":["Deployment", "Cloud Infrastructure"],
+            "languages":["Python"]
+        },
+        "CAIR_Research":{
+            "type":"research",
+            "related":{
+                "MITLL":3
+            },
+            "skills":["Computer Vision","Deployment", "Machine Learning"],
+            "languages":["Python"]
+        },
+        "Greenzone":{
+            "type":"personal_project",
+            "related":{
+                "LULCTracker": 3
+            },
+            "skills":["Deployment", "GIS", "WebDev"],
+            "languages":["Typescript"]
+        }
+        
+    },
+    "project_list":["Google_STEP","MITLL","CAIR_Research","Greenzone"],
+    "key_index":{"Google_STEP":0,"MITLL":1,"CAIR_Research":2,"Greenzone":3},
+    "reverse_key_index":{"0":"Google_STEP","1":"MITLL","2":"CAIR_Research","3":"Greenzone"}
+    
+}

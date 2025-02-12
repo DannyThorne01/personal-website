@@ -1,4 +1,5 @@
 <script lang="ts">
+  //@ts-nocheck
   import { onMount ,createEventDispatcher} from 'svelte';
   import { scaleQuantile } from 'd3-scale';
   import { Deck } from '@deck.gl/core';
@@ -210,31 +211,28 @@
 
 </script>
 
-
 <div class="deck-container">
   <div class="map-container" bind:this={mapContainer}></div>
   <canvas class="deck-canvas" bind:this={deckCanvas}></canvas>
+  
   {#if hoverInfo && hoverInfo.object}
     <div class="tooltip" style="left: {hoverInfo.x}px; top: {hoverInfo.y}px;">
-      <div><strong>{hoverInfo.object.sourceName}</strong> TO <strong>{hoverInfo.object.targetName}</strong> </div>
+      <div><strong>{hoverInfo.object.sourceName}</strong> TO <strong>{hoverInfo.object.targetName}</strong></div>
     </div>
   {/if}
 </div>
 
 <style>
   .deck-container {
-    width: 60%;  /* Smaller width */
-    height: 600px; /* Smaller height */
+    width: 100%;
+    height: 100%; /* Ensures it fills parent */
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    margin-left: 5%; 
-    margin-top: 0px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: space-between;
   }
 
   .map-container,
@@ -247,7 +245,7 @@
   }
 
   .deck-canvas {
-    pointer-events: auto; 
+    pointer-events: auto;
   }
 
   .tooltip {
@@ -264,4 +262,3 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 </style>
-

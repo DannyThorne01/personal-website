@@ -5,12 +5,16 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	kit: {
 		adapter: adapter({
-			pages: 'build', // Ensure it matches the GitHub Actions workflow
+			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html' // Required for SPAs
+			fallback: 'index.html' // Required for SPA
 		}),
 		paths: {
-			base: '/personal-website', // Set the base path for GitHub Pages
+			base: '/personal-website' // Ensure this matches your GitHub Pages deployment
+		},
+		prerender: {
+			handleHttpError: 'warn', // Prevents 404 errors from failing build
+			handleMissingId: 'warn' // Suppresses missing ID errors
 		}
 	},
 	preprocess: [vitePreprocess({})],

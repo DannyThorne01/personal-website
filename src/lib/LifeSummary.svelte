@@ -18,16 +18,11 @@
 <style>
   /* Profile Container */
   .profile-container {
-    width: 30%;
-    height: 600px;
+    width: 100%; /* Full width of parent */
+    height: 100%; /* Full height of parent */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 66%;
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-60%);
   }
 
   /* Profile Card */
@@ -70,16 +65,5 @@
     font-size: 14px;
     color: #555;
     line-height: 1.5;
-  }
-
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .profile-container {
-      width: 90%;
-      height: auto;
-      position: relative;
-      transform: none;
-      margin: 20px auto;
-    }
   }
 </style>
